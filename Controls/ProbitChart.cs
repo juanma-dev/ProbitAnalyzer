@@ -237,7 +237,7 @@ public class ProbitChart : Canvas
             RenderTransformOrigin = new Point(0.5, 0.5),
         };
         yLabel.Measure(new Size(h, w));
-        SetLeft(yLabel, -12);
+        SetLeft(yLabel, -25);
         SetTop(yLabel, TopPadding + (h - TopPadding - Padding) / 2 + yLabel.DesiredSize.Width / 2);
         Children.Add(yLabel);
     }
