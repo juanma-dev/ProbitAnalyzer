@@ -8,6 +8,14 @@
     <UseWPF>true</UseWPF>
     <AssemblyTitle>Probit Analyzer</AssemblyTitle>
     <Description>Análisis Probit para determinar concentraciones letales LC50 y LC95</Description>
+    <Copyright>Copyright © 2026 Juanma. Licensed under GNU GPL v3.</Copyright>
+    <Authors>Juanma</Authors>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <Version>1.0.0</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
+  </ItemGroup>
 
 </Project>

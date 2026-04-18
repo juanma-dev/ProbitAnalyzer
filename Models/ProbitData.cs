@@ -1,3 +1,19 @@
+// Probit Analyzer — Análisis de Concentración Letal
+// Copyright (C) 2026 Juanma
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 using System.ComponentModel;
 
 namespace ProbitAnalyzer.Models;
@@ -141,6 +157,7 @@ public class ProbitResults
     public double Intercept { get; set; }       // a (intercepto)
     public double Slope { get; set; }            // b (pendiente)
     public double RSquared { get; set; }         // R²
+    public double R { get; set; }                // R (coeficiente de correlación de Pearson)
     public double LC50 { get; set; }             // Concentración Letal 50%
     public double LC95 { get; set; }             // Concentración Letal 95%
     public double LC10 { get; set; }             // Concentración Letal 10%
