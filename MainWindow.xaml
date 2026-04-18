@@ -1,0 +1,606 @@
+<Window x:Class="ProbitAnalyzer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:ProbitAnalyzer.Controls"
+        xmlns:converters="clr-namespace:ProbitAnalyzer.Converters"
+        Title="🧪 Probit Analyzer — Análisis de Concentración Letal"
+        Height="820" Width="1280"
+        MinHeight="700" MinWidth="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="#0F1117"
+        Foreground="#E2E8F0"
+        FontFamily="Segoe UI, Arial">
+
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVis"/>
+        <converters:InverseBoolConverter x:Key="InverseBool"/>
+
+        <!-- Color Palette -->
+        <Color x:Key="BgDark">#0F1117</Color>
+        <Color x:Key="BgCard">#1A1D2E</Color>
+        <Color x:Key="BgCardHover">#222640</Color>
+        <Color x:Key="BorderSubtle">#2D3154</Color>
+        <Color x:Key="AccentBlue">#63B3ED</Color>
+        <Color x:Key="AccentPink">#EC4899</Color>
+        <Color x:Key="AccentPurple">#A855F7</Color>
+        <Color x:Key="AccentGreen">#34D399</Color>
+        <Color x:Key="AccentOrange">#FB923C</Color>
+        <Color x:Key="TextPrimary">#E2E8F0</Color>
+        <Color x:Key="TextSecondary">#94A3B8</Color>
+        <Color x:Key="TextMuted">#64748B</Color>
+
+        <SolidColorBrush x:Key="BgDarkBrush" Color="{StaticResource BgDark}"/>
+        <SolidColorBrush x:Key="BgCardBrush" Color="{StaticResource BgCard}"/>
+        <SolidColorBrush x:Key="BorderSubtleBrush" Color="{StaticResource BorderSubtle}"/>
+        <SolidColorBrush x:Key="AccentBlueBrush" Color="{StaticResource AccentBlue}"/>
+        <SolidColorBrush x:Key="AccentPinkBrush" Color="{StaticResource AccentPink}"/>
+        <SolidColorBrush x:Key="AccentGreenBrush" Color="{StaticResource AccentGreen}"/>
+        <SolidColorBrush x:Key="AccentOrangeBrush" Color="{StaticResource AccentOrange}"/>
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMuted}"/>
+
+        <!-- Modern TextBox Style -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#141726"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtleBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="CaretBrush" Value="{StaticResource AccentBlueBrush}"/>
+            <Setter Property="SelectionBrush" Value="{StaticResource AccentBlueBrush}"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource AccentBlueBrush}"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush">
+                        <Setter.Value>
+                            <SolidColorBrush Color="#4A5180"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Primary Button Style -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="8" Padding="{TemplateBinding Padding}"
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Secondary Button Style -->
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtleBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="6" Padding="{TemplateBinding Padding}"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#222640"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#2D3154"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Remove Button Style -->
+        <Style x:Key="RemoveButton" TargetType="Button">
+            <Setter Property="Width" Value="26"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="4" 
+                                Background="{TemplateBinding Background}"
+                                Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+                            <TextBlock Text="✕" FontSize="12" 
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#3B1A1A"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Foreground">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#F87171"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Card Border Style -->
+        <Style x:Key="CardBorder" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource BgCardBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtleBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="20"/>
+        </Style>
+
+        <!-- DataGrid Styling -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="RowBackground" Value="#141726"/>
+            <Setter Property="AlternatingRowBackground" Value="#181C30"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource BorderSubtleBrush}"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#1E2235"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtleBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        </Style>
+
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <SolidColorBrush Color="#63B3ED" Opacity="0.15"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="DataGridRow">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <SolidColorBrush Color="#63B3ED" Opacity="0.08"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══════════ HEADER ═══════════ -->
+        <Border Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="{StaticResource BorderSubtleBrush}">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#0F1117" Offset="0"/>
+                    <GradientStop Color="#151830" Offset="0.5"/>
+                    <GradientStop Color="#0F1117" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid Margin="24,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="🧪" FontSize="28" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <StackPanel>
+                        <TextBlock FontSize="20" FontWeight="Bold">
+                            <TextBlock.Foreground>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#63B3ED" Offset="0"/>
+                                    <GradientStop Color="#A855F7" Offset="0.5"/>
+                                    <GradientStop Color="#EC4899" Offset="1"/>
+                                </LinearGradientBrush>
+                            </TextBlock.Foreground>
+                            Probit Analyzer
+                        </TextBlock>
+                        <TextBlock Text="Análisis de Concentración Letal — LC₅₀ &amp; LC₉₅"
+                                   Foreground="{StaticResource TextMutedBrush}" FontSize="12" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource TextMutedBrush}" 
+                               FontSize="12" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══════════ MAIN CONTENT ═══════════ -->
+        <Grid Grid.Row="1" Margin="16,16,16,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="380" MinWidth="300"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ═══ LEFT PANEL: Data Entry ═══ -->
+            <Grid Grid.Column="0" Margin="0,0,8,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Data Input Card -->
+                <Border Grid.Row="0" Style="{StaticResource CardBorder}" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Section Header -->
+                        <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                            <TextBlock Text="📋 Datos de Entrada" FontSize="15" FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Concentración (µL/L) y Mortalidad (%)" FontSize="11"
+                                       Foreground="{StaticResource TextMutedBrush}" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <!-- Action Buttons Row -->
+                        <WrapPanel Grid.Row="1" Margin="0,0,0,10">
+                            <Button Content="＋ Fila" Style="{StaticResource SecondaryButton}" 
+                                    Click="AddRow_Click" Margin="0,0,6,0"/>
+                            <Button Content="🔄 Ejemplo" Style="{StaticResource SecondaryButton}" 
+                                    Click="LoadExample_Click" Margin="0,0,6,0"/>
+                            <Button Content="🗑 Limpiar" Style="{StaticResource SecondaryButton}" 
+                                    Click="ClearAll_Click"/>
+                        </WrapPanel>
+
+                        <!-- Data Grid -->
+                        <DataGrid Grid.Row="2" x:Name="dgData"
+                                  ItemsSource="{Binding DataPoints}"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  CanUserReorderColumns="False"
+                                  VerticalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="#" Binding="{Binding Index}" 
+                                                    Width="35" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Conc. (µL/L)" 
+                                                    Binding="{Binding Concentration, StringFormat=F2}" 
+                                                    Width="*"/>
+                                <DataGridTextColumn Header="Mort. (%)" 
+                                                    Binding="{Binding Mortality, StringFormat=F1}" 
+                                                    Width="*"/>
+                                <DataGridTextColumn Header="Log₁₀(C)" 
+                                                    Binding="{Binding LogConcentration, StringFormat=F4}" 
+                                                    Width="80" IsReadOnly="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Probit" 
+                                                    Binding="{Binding ProbitValue, StringFormat=F4}" 
+                                                    Width="70" IsReadOnly="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{StaticResource AccentBlueBrush}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTemplateColumn Header="" Width="30">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Style="{StaticResource RemoveButton}" 
+                                                    Click="RemoveRow_Click" Tag="{Binding}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Calculate Button -->
+                        <Button Grid.Row="3" Content="⚡ CALCULAR ANÁLISIS PROBIT" 
+                                Click="Calculate_Click" Margin="0,12,0,0"
+                                Style="{StaticResource PrimaryButton}" Height="44">
+                            <Button.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#6366F1" Offset="0"/>
+                                    <GradientStop Color="#A855F7" Offset="0.5"/>
+                                    <GradientStop Color="#EC4899" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Button.Background>
+                        </Button>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ═══ RIGHT PANEL: Results & Chart ═══ -->
+            <Grid Grid.Column="1" Margin="8,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Results Cards -->
+                <Grid Grid.Row="0" Margin="0,0,0,8"
+                      Visibility="{Binding HasResults, Converter={StaticResource BoolToVis}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- LC50 Card -->
+                    <Border Grid.Column="0" CornerRadius="12" Margin="0,0,6,0" Padding="16">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#0D2818" Offset="0"/>
+                                <GradientStop Color="#1A1D2E" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.BorderBrush>
+                            <SolidColorBrush Color="#34D399" Opacity="0.3"/>
+                        </Border.BorderBrush>
+                        <Border.BorderThickness>1</Border.BorderThickness>
+                        <StackPanel>
+                            <TextBlock Text="LC₅₀" FontSize="12" Foreground="{StaticResource AccentGreenBrush}" 
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Results.LC50, StringFormat=F4}" FontSize="22" 
+                                       FontWeight="Bold" Foreground="{StaticResource AccentGreenBrush}" 
+                                       Margin="0,4,0,2"/>
+                            <TextBlock Text="µL/L" FontSize="10" Foreground="{StaticResource TextMutedBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- LC95 Card -->
+                    <Border Grid.Column="1" CornerRadius="12" Margin="3,0,3,0" Padding="16">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#271A0A" Offset="0"/>
+                                <GradientStop Color="#1A1D2E" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.BorderBrush>
+                            <SolidColorBrush Color="#FB923C" Opacity="0.3"/>
+                        </Border.BorderBrush>
+                        <Border.BorderThickness>1</Border.BorderThickness>
+                        <StackPanel>
+                            <TextBlock Text="LC₉₅" FontSize="12" Foreground="{StaticResource AccentOrangeBrush}" 
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Results.LC95, StringFormat=F4}" FontSize="22" 
+                                       FontWeight="Bold" Foreground="{StaticResource AccentOrangeBrush}" 
+                                       Margin="0,4,0,2"/>
+                            <TextBlock Text="µL/L" FontSize="10" Foreground="{StaticResource TextMutedBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- R² Card -->
+                    <Border Grid.Column="2" CornerRadius="12" Margin="3,0,3,0" Padding="16">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#1A0D28" Offset="0"/>
+                                <GradientStop Color="#1A1D2E" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.BorderBrush>
+                            <SolidColorBrush Color="#A855F7" Opacity="0.3"/>
+                        </Border.BorderBrush>
+                        <Border.BorderThickness>1</Border.BorderThickness>
+                        <StackPanel>
+                            <TextBlock Text="R²" FontSize="12" FontWeight="SemiBold">
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="#A855F7"/>
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                            <TextBlock Text="{Binding Results.RSquared, StringFormat=F6}" FontSize="22" 
+                                       FontWeight="Bold" Margin="0,4,0,2">
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="#A855F7"/>
+                                </TextBlock.Foreground>
+                            </TextBlock>
+                            <TextBlock Text="Coef. Determinación" FontSize="10" 
+                                       Foreground="{StaticResource TextMutedBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Equation Card -->
+                    <Border Grid.Column="3" CornerRadius="12" Margin="6,0,0,0" Padding="16">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#0D1A28" Offset="0"/>
+                                <GradientStop Color="#1A1D2E" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.BorderBrush>
+                            <SolidColorBrush Color="#63B3ED" Opacity="0.3"/>
+                        </Border.BorderBrush>
+                        <Border.BorderThickness>1</Border.BorderThickness>
+                        <StackPanel>
+                            <TextBlock Text="Ecuación" FontSize="12" Foreground="{StaticResource AccentBlueBrush}" 
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Results.Equation}" FontSize="14" 
+                                       FontWeight="Bold" Foreground="{StaticResource AccentBlueBrush}" 
+                                       Margin="0,4,0,2" TextWrapping="Wrap"/>
+                            <TextBlock Text="Y=Probit, X=Log₁₀(C)" FontSize="10" 
+                                       Foreground="{StaticResource TextMutedBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Chart Area -->
+                <Border Grid.Row="1" Style="{StaticResource CardBorder}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                            <TextBlock Text="📈 Gráfico de Regresión Probit" FontSize="15" 
+                                       FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <TextBlock Text="  —  Y = a + b·X" Foreground="{StaticResource TextMutedBrush}" 
+                                       FontSize="12" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        </StackPanel>
+
+                        <controls:ProbitChart Grid.Row="1" x:Name="probitChart" 
+                                              MinHeight="300"/>
+                    </Grid>
+                </Border>
+
+                <!-- Error Message -->
+                <Border Grid.Row="1" CornerRadius="12" Margin="0,80,0,0" Padding="20"
+                        Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}"
+                        VerticalAlignment="Top" HorizontalAlignment="Center" MaxWidth="400">
+                    <Border.Background>
+                        <SolidColorBrush Color="#2D1418"/>
+                    </Border.Background>
+                    <Border.BorderBrush>
+                        <SolidColorBrush Color="#F87171" Opacity="0.3"/>
+                    </Border.BorderBrush>
+                    <Border.BorderThickness>1</Border.BorderThickness>
+                    <StackPanel>
+                        <TextBlock Text="⚠️ Error" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,6">
+                            <TextBlock.Foreground>
+                                <SolidColorBrush Color="#F87171"/>
+                            </TextBlock.Foreground>
+                        </TextBlock>
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource TextSecondaryBrush}" 
+                                   FontSize="12" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <!-- ═══════════ FOOTER: Additional Results ═══════════ -->
+        <Border Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="{StaticResource BorderSubtleBrush}"
+                Visibility="{Binding HasResults, Converter={StaticResource BoolToVis}}">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#0F1117" Offset="0"/>
+                    <GradientStop Color="#141726" Offset="0.5"/>
+                    <GradientStop Color="#0F1117" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid Margin="24,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                    <TextBlock Text="Intercepto (a)" FontSize="10" Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding Results.Intercept, StringFormat=F6}" FontSize="13" 
+                               FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                    <TextBlock Text="Pendiente (b)" FontSize="10" Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding Results.Slope, StringFormat=F6}" FontSize="13" 
+                               FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Margin="0,0,16,0">
+                    <TextBlock Text="LC₁₀ (µL/L)" FontSize="10" Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding Results.LC10, StringFormat=F4}" FontSize="13" 
+                               FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="3" Margin="0,0,16,0">
+                    <TextBlock Text="LC₉₀ (µL/L)" FontSize="10" Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding Results.LC90, StringFormat=F4}" FontSize="13" 
+                               FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="4" Margin="0,0,16,0">
+                    <TextBlock Text="Error Est. Pendiente" FontSize="10" Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding Results.StandardErrorSlope, StringFormat=F6}" FontSize="13" 
+                               FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="5">
+                    <TextBlock Text="χ² (Bondad Ajuste)" FontSize="10" Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding Results.Chi2, StringFormat=F4}" FontSize="13" 
+                               FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
