@@ -1,0 +1,2 @@
+C:\Users\juanm\Documentos\Documents\PROGRAMMING\estadistica_probit\bin\Release\net8.0-windows\win-x64\publish\ProbitAnalyzer.pdb
+C:\Users\juanm\Documentos\Documents\PROGRAMMING\estadistica_probit\bin\Release\net8.0-windows\win-x64\publish\ProbitAnalyzer.exe

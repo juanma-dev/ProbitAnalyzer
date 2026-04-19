@@ -85,24 +85,35 @@ public static class ExcelExporter
         }
 
         // ── Data Rows ──
-        var validPoints = dataPoints
-            .Where(p => p.Concentration > 0 && p.Mortality > 0 && p.Mortality < 100)
-            .ToList();
-
-        for (int i = 0; i < validPoints.Count; i++)
+        for (int i = 0; i < dataPoints.Count; i++)
         {
             int row = i + 5;
-            var point = validPoints[i];
-            double predicted = results.Intercept + results.Slope * point.LogConcentration;
-            double residual = point.ProbitValue - predicted;
-
+            var point = dataPoints[i];
+            
             ws.Cell(row, 1).Value = i + 1;
             ws.Cell(row, 2).Value = point.Concentration;
             ws.Cell(row, 3).Value = point.Mortality;
-            ws.Cell(row, 4).Value = point.LogConcentration;
-            ws.Cell(row, 5).Value = point.ProbitValue;
-            ws.Cell(row, 6).Value = predicted;
-            ws.Cell(row, 7).Value = residual;
+
+            bool isValid = point.Concentration > 0 && point.Mortality > 0 && point.Mortality < 100;
+            if (isValid)
+            {
+                double predicted = results.Intercept + results.Slope * point.LogConcentration;
+                double residual = point.ProbitValue - predicted;
+
+                ws.Cell(row, 4).Value = point.LogConcentration;
+                ws.Cell(row, 5).Value = point.ProbitValue;
+                ws.Cell(row, 6).Value = predicted;
+                ws.Cell(row, 7).Value = residual;
+            }
+            else
+            {
+                ws.Cell(row, 4).Value = "N/A";
+                ws.Cell(row, 5).Value = "N/A";
+                ws.Cell(row, 6).Value = "N/A";
+                ws.Cell(row, 7).Value = "N/A";
+                ws.Range(row, 4, row, 7).Style.Font.Italic = true;
+                ws.Range(row, 4, row, 7).Style.Font.FontColor = XLColor.Gray;
+            }
 
             var bgColor = i % 2 == 0 ? RowEven : RowOdd;
             ws.Range(row, 1, row, 7).Style.Fill.BackgroundColor = bgColor;
@@ -118,7 +129,7 @@ public static class ExcelExporter
         ws.Column(7).Style.NumberFormat.Format = "0.0000";
 
         // Table border
-        int lastDataRow = 4 + validPoints.Count;
+        int lastDataRow = 4 + dataPoints.Count;
         var dataRange = ws.Range(4, 1, lastDataRow, 7);
         dataRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
         dataRange.Style.Border.OutsideBorderColor = XLColor.LightGray;

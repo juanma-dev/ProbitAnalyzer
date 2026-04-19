@@ -71,6 +71,80 @@ public partial class MainWindow : Window
         }
     }
 
+    private void PasteData_Click(object sender, RoutedEventArgs e)
+    {
+        DoSmartPaste();
+    }
+
+    private void dgData_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        // Detect Ctrl+V
+        if (e.Key == System.Windows.Input.Key.V && (System.Windows.Input.Keyboard.Modifiers & System.Windows.Input.ModifierKeys.Control) == System.Windows.Input.ModifierKeys.Control)
+        {
+            DoSmartPaste();
+            e.Handled = true;
+        }
+    }
+
+    private bool ParseDouble(string str, out double result)
+    {
+        str = str.Trim();
+        if (double.TryParse(str, out result)) return true;
+        // Fallback: try parsing with invariant culture replacing comma
+        if (double.TryParse(str.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out result)) return true;
+        return false;
+    }
+
+    private void DoSmartPaste()
+    {
+        if (!Clipboard.ContainsText())
+        {
+            MessageBox.Show("El portapapeles está vacío o no contiene texto.", "Pegar Datos", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string text = Clipboard.GetText();
+        string[] lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        if (lines.Length == 0) return;
+
+        // Smart clearing if all current points are empty
+        bool allEmpty = !_viewModel.DataPoints.Any(p => p.Concentration > 0 || p.Mortality > 0);
+        if (allEmpty)
+        {
+            _viewModel.DataPoints.Clear();
+        }
+
+        int added = 0;
+        foreach (var line in lines)
+        {
+            string[] parts = line.Split(new[] { '\t' });
+            if (parts.Length >= 1)
+            {
+                if (ParseDouble(parts[0], out double col1))
+                {
+                    double col2 = 0;
+                    if (parts.Length >= 2)
+                    {
+                        ParseDouble(parts[1], out col2);
+                    }
+
+                    _viewModel.DataPoints.Add(new ProbitDataPoint { Concentration = col1, Mortality = col2 });
+                    added++;
+                }
+            }
+        }
+
+        if (added > 0)
+        {
+            _viewModel.StatusMessage = $"✓ Se pegaron {added} filas desde el portapapeles.";
+            // Reindex
+            for (int i = 0; i < _viewModel.DataPoints.Count; i++)
+            {
+                _viewModel.DataPoints[i].Index = i + 1;
+            }
+        }
+    }
+
     private void ClearAll_Click(object sender, RoutedEventArgs e)
     {
         _viewModel.ClearAll();
@@ -121,14 +195,15 @@ public partial class MainWindow : Window
         {
             try
             {
-                var validPoints = _viewModel.DataPoints
-                    .Where(p => p.Concentration > 0 && p.Mortality > 0 && p.Mortality < 100)
+                // Get all valid rows where user actually entered something
+                var allPoints = _viewModel.DataPoints
+                    .Where(p => p.Concentration != 0 || p.Mortality != 0)
                     .ToList();
 
                 // Capture chart as PNG image
                 MemoryStream? chartStream = CaptureChartAsImage();
 
-                ExcelExporter.Export(dialog.FileName, validPoints, _viewModel.Results, chartStream);
+                ExcelExporter.Export(dialog.FileName, allPoints, _viewModel.Results, chartStream);
 
                 chartStream?.Dispose();
 

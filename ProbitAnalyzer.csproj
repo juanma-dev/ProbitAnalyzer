@@ -12,10 +12,15 @@
     <Authors>Juanma</Authors>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <Version>1.0.0</Version>
+    <ApplicationIcon>probeta.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.104.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="probeta.png" />
   </ItemGroup>
 
 </Project>

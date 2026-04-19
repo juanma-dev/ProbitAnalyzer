@@ -6,13 +6,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:ProbitAnalyzer.Controls"
         xmlns:converters="clr-namespace:ProbitAnalyzer.Converters"
-        Title="🧪 Probit Analyzer — Análisis de Concentración Letal"
+        Title="Probit Analyzer — Análisis de Concentración Letal"
         Height="820" Width="1280"
         MinHeight="700" MinWidth="1000"
         WindowStartupLocation="CenterScreen"
         Background="#0F1117"
         Foreground="#E2E8F0"
-        FontFamily="Segoe UI, Arial">
+        FontFamily="Segoe UI, Arial"
+        Icon="probeta.png">
 
     <Window.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVis"/>
@@ -417,6 +418,9 @@
                         <WrapPanel Grid.Row="1" Margin="0,0,0,10">
                             <Button Content="＋ Fila" Style="{StaticResource SecondaryButton}" 
                                     Click="AddRow_Click" Margin="0,0,6,0"/>
+                            <Button Content="📋 Pegar" Style="{StaticResource SecondaryButton}" 
+                                    Click="PasteData_Click" Margin="0,0,6,0"
+                                    ToolTip="Pegar 2 columnas desde Excel (Concentración y Mortalidad)"/>
                             <Button Content="🔄 Ejemplo" Style="{StaticResource SecondaryButton}" 
                                     Click="LoadExample_Click" Margin="0,0,6,0"/>
                             <Button Content="🗑 Limpiar" Style="{StaticResource SecondaryButton}" 
@@ -430,7 +434,8 @@
                                   CanUserAddRows="False"
                                   CanUserDeleteRows="False"
                                   CanUserReorderColumns="False"
-                                  VerticalScrollBarVisibility="Auto">
+                                  VerticalScrollBarVisibility="Auto"
+                                  PreviewKeyDown="dgData_PreviewKeyDown">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="#" Binding="{Binding Index}" 
                                                     Width="35" IsReadOnly="True"/>
