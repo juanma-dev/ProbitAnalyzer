@@ -1,0 +1,9 @@
+bin/
+obj/
+*.user
+*.userprefs
+*.suo
+.vs/
+MakeIco.ps1
+probeta.png
+*.log
